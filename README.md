@@ -6,4 +6,4 @@ How to access presentation material:
 
 1. Press the "Open in Callysto" button.
 2. Link will redirect you to authenticate via the Callysto hub (options: Google or Microsoft)
-3. Press the "Enter/Exit RISE Slideshow"
+3. Press the "Enter/Exit RISE Slideshow" button
