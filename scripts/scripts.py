@@ -1,6 +1,6 @@
 # Authors: Bryce Haley, Laura Gutierrez Funderburk
 # Created on June 2020
-# Last modified on Feb 26 2021
+# Last modified on Janury 28 2022
 """
 This script contains functions whose goal is to model Coast Salish Fish Traps
 
@@ -55,7 +55,7 @@ def create_dated_tide_plot(dataframe):
     
     try:
     
-        fig = px.line(dataframe, x="Date", y="Height_m", line_shape='spline')
+        fig = px.line(dataframe, x="eventDate", y="value", line_shape='spline')
         fig.update_layout(title='Measured Tide Readings for ' + u'\u0294agayqs\u03B5n',
                 xaxis_title = 'Time (Days Since Start)',
                 yaxis_title = 'Tide Level (Meters Above Sea Level)')
@@ -215,7 +215,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest= 0, radius= default_r
     movement_rate = 0.025
     max_fish = 1000
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
-    tide_values = monthly_tide_df["Height_m"]
+    tide_values = monthly_tide_df["value"]
     perimeter = get_perimeter(radius, height, delta, slope)
     height_adjustment =1 /  min(1, height / 4)
 #TODO
@@ -472,6 +472,8 @@ def plot_interactive_map(latitude, longitude, tag="Comox Valley Harbour"):
                       clustered_marker = True).add_to(marker_cluster)
 
     # Show the map
+    map_osm.save("map.html")
+
     display(map_osm)
 
 def create_tide_plot_grade6(radius= default_radius, height= default_height, delta= default_delta,
@@ -559,8 +561,8 @@ def create_3d_trap(radius, height, delta):
     beach_surf = plt3d.plot_surface(xx, yy, zz, alpha=0.2, color = 'brown', label = "beach")
    
    # tide_surf equations below get the legend to show
-    beach_surf._facecolors2d=beach_surf._facecolors3d
-    beach_surf._edgecolors2d=beach_surf._edgecolors3d
+    beach_surf._facecolors2d=beach_surf._facecolor3d
+    beach_surf._edgecolors2d=beach_surf._edgecolor3d
 
 
     # find data for the points on the trap on top of the beach points
@@ -729,15 +731,15 @@ def run_ui_updated(radius, height, location,harvesting_percent):
 
     
     fig.add_trace(
-        go.Scatter(x=monthly_tide_df["Date"], y=monthly_tide_df["Height_m"],name="Weekly Tide",
+        go.Scatter(x=monthly_tide_df["eventDate"], y=monthly_tide_df["value"],name="Weekly Tide",
                    text= [f'<b>Day</b>: {x}<br>' \
-                           for x in monthly_tide_df['Date'].values],
+                           for x in monthly_tide_df['eventDate'].values],
                         hovertemplate='%{text}<br>%{y:}m above sea-level'),
                  row=1, col=1
                  )
     
      # add line to show low point of the trap
-    x = monthly_tide_df['Date']
+    x = monthly_tide_df['eventDate']
     y = np.full(len(x), low_point)
     
     fig.add_trace(
@@ -819,8 +821,8 @@ def create_3d_trap(radius, height, delta):
 
     beach_surf = plt3d.plot_surface(xx, yy, zz, alpha=0.2, color = 'brown', label = "beach")
     # tide_surf equations below get the legend to show
-    beach_surf._facecolors2d=beach_surf._facecolors3d
-    beach_surf._edgecolors2d=beach_surf._edgecolors3d
+    beach_surf._facecolors2d=beach_surf._facecolor3d
+    beach_surf._edgecolors2d=beach_surf._edgecolor3d
 
 
 
@@ -835,8 +837,8 @@ def create_3d_trap(radius, height, delta):
     z = np.array(tuple(zip(z, z2)))
 
     trap_surface = plt3d.plot_surface(x,y,z, label='trap')
-    trap_surface._facecolors2d=trap_surface._facecolors3d
-    trap_surface._edgecolors2d=trap_surface._edgecolors3d
+    trap_surface._facecolors2d=trap_surface._facecolor3d
+    trap_surface._edgecolors2d=trap_surface._edgecolor3d
 
 
     plt3d.set_xlabel('X')
@@ -873,7 +875,9 @@ if __name__ == "__main__":
 
     style = {'description_width': 'initial'}
     
-    monthly_tide_df = pd.read_csv("./resources/tidesSubset.csv")
+    now = datetime.now()
+    endTime = now.strftime("%Y-%m-%d")
+    monthly_tide_df = pd.read_csv(f'./resources/{endTime}_tideData.csv')
 
     all_the_widgets = [widgets.IntSlider(
         value=25, 
